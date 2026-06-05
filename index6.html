@@ -460,5 +460,49 @@
         // تهيئة الصفحة
         selectRole('user');
     </script>
+	<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+  // استبدل القيم أدناه بالقيم الخاصة بك من Firebase Console
+  const firebaseConfig = {
+    apiKey: "AIzaSyBRjbfsiiTauEPzU6_im6GzcnThnjzLr1Y",
+    authDomain: "fixgo-c1eb3.firebaseapp.com",
+    projectId: "fixgo-c1eb3",
+    storageBucket: "fixgo-c1eb3.firebasestorage.app",
+    messagingSenderId: "703488228358",
+    appId: "1:703488228358:web:1c473dbfbf144c732e5787"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  document.getElementById('registerBtn').addEventListener('click', async () => {
+    const email = document.querySelector('input[name="email"]').value;
+    const password = document.querySelector('input[name="password"]').value;
+    const name = document.querySelector('input[name="name"]').value;
+    const phone = document.querySelector('input[name="phone"]').value;
+
+    try {
+      // 1. إنشاء حساب المصادقة
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // 2. حفظ البيانات الإضافية في قاعدة بيانات Firestore
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        name: name,
+        email: email,
+        phone: phone,
+        createdAt: new Date()
+      });
+
+      alert("تم تسجيلك بنجاح!");
+      window.location.href = "index.html"; // صفحة النجاح
+    } catch (error) {
+      alert("خطأ أثناء التسجيل: " + error.message);
+    }
+  });
+</script>
 </body>
 </html>
