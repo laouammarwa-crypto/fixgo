@@ -1,0 +1,915 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixGo - منصة ذكية لخدمات ميكانيك وإسعاف السيارات</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Segoe UI', 'Cairo', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* خلفية متحركة */
+        .hero-section {
+            position: relative;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            overflow: hidden;
+        }
+
+        /* دوائر خلفية متحركة */
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .circle1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .circle2 {
+            width: 500px;
+            height: 500px;
+            bottom: -200px;
+            left: -150px;
+            animation-delay: 5s;
+        }
+
+        .circle3 {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 20%;
+            animation-delay: 10s;
+        }
+
+        .circle4 {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            right: 10%;
+            animation-delay: 15s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+            25% { transform: translateY(-30px) translateX(20px) rotate(5deg); }
+            50% { transform: translateY(20px) translateX(-20px) rotate(-5deg); }
+            75% { transform: translateY(-20px) translateX(-10px) rotate(3deg); }
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #764ba2 !important;
+            transform: translateY(-2px);
+        }
+
+        /* المحتوى الرئيسي */
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            padding: 120px 0 80px;
+            color: white;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* بطاقات الأدوار */
+        .role-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 35px 25px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .role-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .role-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .role-icon {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            transition: all 0.3s;
+        }
+
+        .role-card:hover .role-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .role-icon.user { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .role-icon.mechanic { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .role-icon.tow { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+
+        .role-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .role-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .btn-role {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-role:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: white;
+        }
+
+        /* قسم المميزات */
+        .features-section {
+            background: white;
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 30px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 35px;
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            color: #667eea;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* قسم الإحصائيات */
+        .stats-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 60px 0;
+            color: white;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        /*ستايل قائمة اختيار اللغات*/
+       .dropdown-menu a {
+           display: flex !important;
+         align-items: center;
+         justify-content: flex-start;
+         gap: 10px;
+         padding: 8px 15px;
+         color: #333 !important;
+         text-decoration: none;
+        }
+        .dropdown-menu a:hover {
+         background-color: #f1f1f1;
+         color: #764ba2 !important;
+        }
+        /* زر التسجيل والدخول */
+        .btn-login {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-login:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .btn-register {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: white;
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            background: #1a1a2e;
+            color: white;
+            padding: 40px 0;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .hero-content {
+                padding: 100px 0 60px;
+            }
+            .role-card {
+                margin-bottom: 20px;
+            }
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+		iframe {
+         position: fixed;
+         bottom: 20px;
+         right: 20px;
+         z-index: 9999;
+         border-radius: 20px;
+         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+		.sos-icon {
+          width: 50px;
+         height: 50px;
+         background-color: red;
+         color: white;
+         border-radius: 50%;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         font-weight: bold;
+         cursor: pointer;
+         box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+         animation: pulse 2s infinite;
+         font-size: 12px;
+        }
+
+        @keyframes pulse {
+         0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+         70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+         100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+        }
+		#chat-babble {
+         /* لون نيلي (Indigo) للفقاعة */
+         background-color: #4B0082; 
+         color: white;
+         padding: 10px 20px;
+         border-radius: 25px;
+         cursor: pointer;
+         display: flex;
+         align-items: center;
+         gap: 8px;
+         /* تأثير الإشعاع (Glow) */
+         box-shadow: 0 0 15px #4B0082, 0 0 20px #4B0082;
+         transition: all 0.3s ease;
+        }
+
+         /* تأثير إضافي عند تمرير الفأرة */
+        #chat-babble:hover {
+          box-shadow: 0 0 25px #4B0082, 0 0 35px #4B0082;
+         transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.php" style="display: flex; align-items: center; gap: 8px;">
+                <img src="logo.PNG" alt="FixGo Logo" style="height: 40px; width: auto; object-fit: contain;">
+                <span style="font-weight: bold;">FixGo</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">المميزات</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#roles">الخدمات</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index2.html" class="btn btn-register btn-lg">
+                            <i class="fas fa-sign-in-alt"></i> دخول
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index6.html" class="btn btn-register btn-lg">
+                            <i class="fas fa-user-plus"></i> تسجيل
+                        </a>
+                    </li>
+					<div id="sos-button" class="sos-icon" onclick="openSOSModal()">SOS</div>
+              </div>  
+					<li class="nav-item dropdown ms-lg-3">,
+                      <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                         <i class="fas fa-globe me-1"></i> اللغة
+                     </a>
+                    <ul class="dropdown-menu dropdown-menu-end text-end" aria-labelledby="langDropdown">
+                     <li> <a class="dropdown-item active" href="?lang=ar"><img src="https://flagcdn.com/16x12/dz.png" class="me-2" alt="Ar"> العربية</a></li>
+                     <li> <a class="dropdown-item" href="?lang=fr"><img src="https://flagcdn.com/16x12/fr.png" class="me-2" alt="Fr"> Français</a></li>
+                     <li> <a class="dropdown-item" href="?lang=en"><img src="https://flagcdn.com/16x12/us.png" class="me-2" alt="En"> English</a></li>
+                     ,</ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- القسم الرئيسي -->
+    <section class="hero-section" id="home">
+        <div class="bg-circle circle1"></div>
+        <div class="bg-circle circle2"></div>
+        <div class="bg-circle circle3"></div>
+        <div class="bg-circle circle4"></div>
+        
+        <div class="container hero-content">
+            <div class="row align-items-center">
+                <div class="col-lg-7" data-aos="fade-right">
+                    <h1 class="hero-title">
+                        FixGo
+                        <br>
+                        <small style="font-size: 1.8rem;">منصة ذكية لخدمات السيارات</small>
+                    </h1>
+                    <p class="hero-subtitle">
+					ربط ذكي وفوري بين أصحاب المركبات، أمهر الميكانيكيين، وخدمات السحب والإنقاذ، مع اعتماد تقنيات تحديد الموقع الجغرافي للوصول إلى أقرب مزود خدمة في أسرع وقت ممكن.
+                    نحن نختصر عليك عناء البحث في اللحظات الحرجة، لنضع بين يديك شبكة دعم متكاملة تضمن لك الطمأنينة على الطريق.
+                    بلمسة واحدة، تتحول الحلول التقنية المتقدمة إلى واقع ملموس يعيد لك راحة البال ويصلح مسار رحلتك أينما كنت
+                    </p>
+                </div>
+                <div class="col-lg-5" data-aos="fade-left" data-aos-delay="200">
+                    <img src="logo.png" style="width: 400px; height: auto; filter: brightness(0) invert(1);" alt="FixGo">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم المميزات -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">✨ مميزات المنصة</h2>
+            <div class="row">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3 class="feature-title">تحديد الموقع الجغرافي</h3 >
+                        <p>اعتماد الموقع الجغرافي لتحديد أقرب ميكانيكي أو شاحنة إسعاف في الوقت الحقيقي</p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h3 class="feature-title">استجابة سريعة</h3>
+                        <p>طلب الخدمة بنقرة واحدة والحصول على استجابة سريعة من أقرب مقدم خدمة</p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3 class="feature-title">نظام تقييم</h3>
+                        <p>تقييم الخدمات المقدمة لضمان الجودة وتحسين الأداء</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم الأدوار -->
+    <section class="features-section" id="roles" style="background: #f8f9fa;">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">🚀 اختر مسارك</h2>
+            <div class="row">
+                <div class="col-md-4" data-aos="flip-right" data-aos-delay="100">
+                    <div class="role-card">
+                        <div class="role-icon user">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3 class="role-title">صاحب سيارة</h3>
+                        <p class="role-description">
+                            احصل على خدمات ميكانيكية فورية وأقرب المساعدين لك، 
+                            تابع طلباتك وتواصل مع مقدمي الخدمة بسهولة
+                        </p>
+						<a href="index3.html#user-section" class="btn btn-role">
+                            <i class="fas fa-user-plus"></i> سجل كصاحب سيارة
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="flip-right" data-aos-delay="200">
+                    <div class="role-card">
+                        <div class="role-icon mechanic">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+                        <h3 class="role-title">ميكانيكي</h3>
+                        <p class="role-description">
+                            عرض خدماتك والوصول لعملاء جدد في منطقتك، 
+                            إدارة الطلبات وزيادة أرباحك
+                        </p>
+                        <a href="register.php?role=mechanic" class="btn btn-role">
+                            <i class="fas fa-wrench"></i> سجل كميكانيكي
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="flip-right" data-aos-delay="300">
+                    <div class="role-card">
+                        <div class="role-icon tow">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <h3 class="role-title">خدمة سحب</h3>
+                        <p class="role-description">
+                            قدم خدمات سحب وإسعاف السيارات للعملاء المحتاجين، 
+                            وسّع نطاق عملك
+                        </p>
+                        <a href="register.php?role=tow" class="btn btn-role">
+                            <i class="fas fa-truck"></i> سجل كخدمة سحب
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم الإحصائيات -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6" data-aos="zoom-in">
+                    <div class="stat-item">
+                        <div class="stat-number">
+                            <span class="counter" data-target="5000">0</span>+
+                        </div>
+                        <div class="stat-label">عميل سعيد</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="stat-item">
+                        <div class="stat-number">
+                            <span class="counter" data-target="200">0</span>+
+                        </div>
+                        <div class="stat-label">ميكانيكي معتمد</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="stat-item">
+                        <div class="stat-number">
+                            <span class="counter" data-target="100">0</span>+
+                        </div>
+                        <div class="stat-label">شاحنة إسعاف</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="stat-item">
+                        <div class="stat-number">
+                            <span class="counter" data-target="98">0</span>%
+                        </div>
+                        <div class="stat-label">رضا العملاء</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- تذييل الصفحة -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5><i class="fas fa-car"></i> FixGo</h5>
+                    <p>منصة ذكية لخدمات ميكانيك وإسعاف السيارات، نربطك بأقرب خدمة في الوقت المناسب.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>روابط سريعة</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#home" class="text-white text-decoration-none">الرئيسية</a></li>
+                        <li><a href="#features" class="text-white text-decoration-none">المميزات</a></li>
+                        <li><a href="#roles" class="text-white text-decoration-none">الخدمات</a></li>
+                        <li><a href="login.php" class="text-white text-decoration-none">تسجيل دخول</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>تواصل معنا</h5>
+                    <p><i class="fas fa-envelope"></i> info@fixgo.com</p>
+                    <p><i class="fas fa-phone"></i> +213 123 456 789</p>
+                </div>
+            </div>
+            <hr class="bg-white">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2024 FixGo - جميع الحقوق محفوظة</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+	
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // تأثير عد الأرقام
+        const counters = document.querySelectorAll('.counter');
+        const speed = 200;
+
+        counters.forEach(counter => {
+            const updateCount = () => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const count = parseInt(counter.innerText);
+                const increment = Math.ceil(target / speed);
+                
+                if (count < target) {
+                    counter.innerText = count + increment;
+                    setTimeout(updateCount, 20);
+                } else {
+                    counter.innerText = target;
+                }
+            }
+            
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    updateCount();
+                    observer.disconnect();
+                }
+            });
+            
+            observer.observe(counter);
+        });
+    </script>
+	<div id="sosModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+       <div style="background:white; padding:30px; border-radius:20px; text-align:center; box-shadow:0px 5px 15px rgba(0,0,0,0.3); width:300px;">
+         <p style="font-size:18px; margin-bottom:20px;">أنت على وشك إرسال نداء طوارئ</p>
+        
+          <div style="display:flex; justify-content:space-around;">
+             <button onclick="closeSOSModal()" style="background:#808080; color:white; border:none; padding:10px 20px; border-radius:15px; cursor:pointer;">إلغاء</button>
+             <button onclick="window.location.href='report.html'" style="background:#FF0000; color:white; border:none; padding:10px 20px; border-radius:15px; cursor:pointer;">أكمل</button>
+         </div>
+       </div>
+   </div>
+
+<script>
+    // دالة الفتح: نجعلها 'flex' وليس 'block' لتعمل مع التوسيط
+    function openSOSModal() {
+        document.getElementById('sosModal').style.display = 'flex';
+    }
+    
+    // دالة الإغلاق: تعيدها إلى 'none' فتختفي
+    function closeSOSModal() {
+        document.getElementById('sosModal').style.display = 'none';
+    }
+</script>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const lang = urlParams.get('lang');
+
+    if (lang === 'fr') {
+	
+        document.documentElement.dir = "ltr";
+        document.documentElement.lang = "fr";
+        
+        // 1. القائمة العلوية (Navbar)
+        const navHome = document.querySelector('a[href="#home"]'); if(navHome) navHome.textContent = "Accueil";
+        const navFeat = document.querySelector('a[href="#feature"]') || document.querySelector('a[href="#features"]'); if(navFeat) navFeat.textContent = "Fonctionnalités";
+        const navRole = document.querySelector('a[href="#role"]') || document.querySelector('a[href="#roles"]'); if(navRole) navRole.textContent = "Services";
+        const btnLogin = document.querySelector('a[href="login.php"]'); if(btnLogin) btnLogin.innerHTML = '<i class="fas fa-sign-in-alt"></i> Connexion';
+        const btnReg = document.querySelector('a[href="register.php"]'); if(btnReg) btnReg.innerHTML = '<i class="fas fa-user-plus"></i> Inscription';
+
+        // 2. قسم الواجهة (Hero Section)
+        const heroH1 = document.querySelector('.hero-section h1'); if(heroH1) heroH1.textContent = "FixGo";
+        const heroP = document.querySelector('.hero-section p'); if(heroP) heroP.textContent = "Une plateforme intelligente pour les services automobiles. Connexion rapide entre les automobilistes, les mécaniciens et les services de remorquage.";
+        
+        const heroBtns = document.querySelectorAll('.hero-section .btn');
+        if(heroBtns.length >= 3) {
+            heroBtns[0].innerHTML = '<i class="fas fa-wrench me-2"></i> Rejoindre comme Mécanicien';
+            heroBtns[1].innerHTML = '<i class="fas fa-car me-2"></i> Rejoindre comme Propriétaire';
+            heroBtns[2].innerHTML = '<i class="fas fa-truck me-2"></i> Rejoindre comme Remorquage';
+        }
+
+        // 3. قسم مميزات المنصة (Features)
+        const secTitle = document.querySelector('.section-title'); if(secTitle) secTitle.innerHTML = '<i class="fas fa-star me-2"></i> Fonctionnalités de la Plateforme';
+        const featTitles = document.querySelectorAll('.feature-title');
+        const featCards = document.querySelectorAll('.feature-card');
+        if(featTitles.length >= 1) featTitles[0].textContent = "Géolocalisation";
+        if(featCards[0] && featCards[0].querySelector('p')) featCards[0].querySelector('p').textContent = "Trouver le service le plus proche en temps réel.";
+        if(featTitles.length >= 2) featTitles[1].textContent = "Réponse Rapide";
+        if(featCards[1] && featCards[1].querySelector('p')) featCards[1].querySelector('p').textContent = "Demandez un service en un clic et obtenez une assistance immédiate.";
+        if(featTitles.length >= 3) featTitles[2].textContent = "Système d'Évaluation";
+        if(featCards[2] && featCards[2].querySelector('p')) featCards[2].querySelector('p').textContent = "Évaluez les services fournis pour garantir la qualité.";
+
+        // 4. حسم ترجمة قسم "اختر مسارك" والبطاقات (الفقاعات) السفلية بشكل مباشر بالترتيب
+        const allH2 = document.querySelectorAll('h2'); if(allH2.length >= 2) allH2[1].innerHTML = '<i class="fas fa-rocket me-2"></i> Choisissez votre Voie';
+
+        const cards = document.querySelectorAll('.card, .role-card');
+        if(cards.length >= 3) {
+            // البطاقة الأولى: صاحب السيارة
+            if(cards[0].querySelector('h3, h4, h5')) cards[0].querySelector('h3, h4, h5').textContent = "Propriétaire de Voiture";
+            if(cards[0].querySelector('p')) cards[0].querySelector('p').textContent = "Obtenez des services mécaniques rapides, suivez vos demandes et communiquez facilement.";
+            if(cards[0].querySelector('.btn')) cards[0].querySelector('.btn').innerHTML = 'S\'inscrire <i class="fas fa-arrow-right ms-1"></i>';
+
+            // البطاقة الثانية: ميكانيكي
+            if(cards[1].querySelector('h3, h4, h5')) cards[1].querySelector('h3, h4, h5').textContent = "Mécanicien";
+            if(cards[1].querySelector('p')) cards[1].querySelector('p').textContent = "Proposez vos services à de nouveaux clients et gérez vos commandes facilement.";
+            if(cards[1].querySelector('.btn')) cards[1].querySelector('.btn').innerHTML = 'S\'inscrire <i class="fas fa-arrow-right ms-1"></i>';
+
+            // البطاقة الثالثة: خدمة سحب (الونش)
+            if(cards[2].querySelector('h3, h4, h5')) cards[2].querySelector('h3, h4, h5').textContent = "Service de Remorquage";
+            if(cards[2].querySelector('p')) cards[2].querySelector('p').textContent = "Offrez des services de remorquage aux clients en détresse et développez votre activité.";
+            if(cards[2].querySelector('.btn')) cards[2].querySelector('.btn').innerHTML = 'S\'inscrire <i class="fas fa-arrow-right ms-1"></i>';
+        }
+
+        // 5. حسم ترجمة الـ Footer (أسفل الموقع والروابط السريعة) بالتفصيل
+        const footerCols = document.querySelectorAll('footer .col-md-4, footer .col-lg-4, footer div');
+        
+        // ترجمة عناوين وأعمدة الفوتر بالبحث عن الكلمات الأساسية داخلها
+        document.querySelectorAll('footer h5, footer h4, footer p, footer a, footer li').forEach(el => {
+            let txt = el.textContent.trim();
+            if(txt.includes("لمحة")) el.textContent = "À propos de FixGo";
+            if(txt.includes("منصة ذكية")) el.textContent = "Une plateforme intelligente visant à faciliter les services automobiles en connectant conducteurs et professionnels.";
+            if(txt.includes("روابط سريعة") || txt.includes("الروابط")) el.textContent = "Liens Rapides";
+            if(txt.includes("تواصل")) el.textContent = "Contactez-nous";
+            if(txt.includes("الرئيسية")) el.textContent = "Accueil";
+            if(txt.includes("المميزات")) el.textContent = "Fonctionnalités";
+            if(txt.includes("الخدمات")) el.textContent = "Services";
+            if(txt.includes("جميع الحقوق")) el.textContent = "© 2026 FixGo. Tous droits réservés.";
+        });
+
+    } else if (lang === 'en') {
+        document.documentElement.dir = "ltr";
+        document.documentElement.lang = "en";
+        
+        // 1. القائمة العلوية إنجليزي
+        const navHome = document.querySelector('a[href="#home"]'); if(navHome) navHome.textContent = "Home";
+        const navFeat = document.querySelector('a[href="#feature"]') || document.querySelector('a[href="#features"]'); if(navFeat) navFeat.textContent = "Features";
+        const navRole = document.querySelector('a[href="#role"]') || document.querySelector('a[href="#roles"]'); if(navRole) navRole.textContent = "Services";
+        const btnLogin = document.querySelector('a[href="login.php"]'); if(btnLogin) btnLogin.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+        const btnReg = document.querySelector('a[href="register.php"]'); if(btnReg) btnReg.innerHTML = '<i class="fas fa-user-plus"></i> Register';
+
+        // 2. قسم Hero إنجليزي
+        const heroH1 = document.querySelector('.hero-section h1'); if(heroH1) heroH1.textContent = "FixGo";
+        const heroP = document.querySelector('.hero-section p'); if(heroP) heroP.textContent = "A smart platform for automotive services. Fast connection between car owners, mechanics, and towing services.";
+        
+        const heroBtns = document.querySelectorAll('.hero-section .btn');
+        if(heroBtns.length >= 3) {
+            heroBtns[0].innerHTML = '<i class="fas fa-wrench me-2"></i> Join as Mechanic';
+            heroBtns[1].innerHTML = '<i class="fas fa-car me-2"></i> Join as Owner';
+            heroBtns[2].innerHTML = '<i class="fas fa-truck me-2"></i> Join as Towing';
+        }
+
+        // 3. قسم المميزات إنجليزي
+        const secTitle = document.querySelector('.section-title'); if(secTitle) secTitle.innerHTML = '<i class="fas fa-star me-2"></i> Platform Features';
+        const featTitles = document.querySelectorAll('.feature-title');
+        const featCards = document.querySelectorAll('.feature-card');
+        if(featTitles.length >= 1) featTitles[0].textContent = "Geo-location";
+        if(featCards[0] && featCards[0].querySelector('p')) featCards[0].querySelector('p').textContent = "Find the nearest service in real-time.";
+        if(featTitles.length >= 2) featTitles[1].textContent = "Fast Response";
+        if(featCards[1] && featCards[1].querySelector('p')) featCards[1].querySelector('p').textContent = "Request service with one click and get instant help.";
+        if(featTitles.length >= 3) featTitles[2].textContent = "Rating System";
+        if(featCards[2] && featCards[2].querySelector('p')) featCards[2].querySelector('p').textContent = "Rate services to ensure high quality.";
+
+        // 4. قسم اختر مسارك إنجليزي
+        const allH2 = document.querySelectorAll('h2'); if(allH2.length >= 2) allH2[1].innerHTML = '<i class="fas fa-rocket me-2"></i> Choose Your Path';
+
+        const cards = document.querySelectorAll('.card, .role-card');
+        if(cards.length >= 3) {
+            if(cards[0].querySelector('h3, h4, h5')) cards[0].querySelector('h3, h4, h5').textContent = "Car Owner";
+            if(cards[0].querySelector('p')) cards[0].querySelector('p').textContent = "Get fast mechanic services near you, track requests, and communicate easily.";
+            if(cards[0].querySelector('.btn')) cards[0].querySelector('.btn').innerHTML = 'Register <i class="fas fa-arrow-right ms-1"></i>';
+
+            if(cards[1].querySelector('h3, h4, h5')) cards[1].querySelector('h3, h4, h5').textContent = "Mechanic";
+            if(cards[1].querySelector('p')) cards[1].querySelector('p').textContent = "Offer your services to new clients and manage your orders easily.";
+            if(cards[1].querySelector('.btn')) cards[1].querySelector('.btn').innerHTML = 'Register <i class="fas fa-arrow-right ms-1"></i>';
+
+            if(cards[2].querySelector('h3, h4, h5')) cards[2].querySelector('h3, h4, h5').textContent = "Towing Service";
+            if(cards[2].querySelector('p')) cards[2].querySelector('p').textContent = "Provide towing services to clients in distress and expand your business reach.";
+            if(cards[2].querySelector('.btn')) cards[2].querySelector('.btn').innerHTML = 'Register <i class="fas fa-arrow-right ms-1"></i>';
+        }
+
+        // 5. الفوتر إنجليزي
+        document.querySelectorAll('footer h5, footer h4, footer p, footer a, footer li').forEach(el => {
+            let txt = el.textContent.trim();
+            if(txt.includes("لمحة")) el.textContent = "About FixGo";
+            if(txt.includes("منصة ذكية")) el.textContent = "A smart platform aiming to facilitate automotive services by connecting drivers and professionals.";
+            if(txt.includes("روابط سريعة") || txt.includes("الروابط")) el.textContent = "Quick Links";
+            if(txt.includes("تواصل")) el.textContent = "Contact Us";
+            if(txt.includes("الرئيسية")) el.textContent = "Home";
+            if(txt.includes("المميزات")) el.textContent = "Features";
+            if(txt.includes("الخدمات")) el.textContent = "Services";
+            if(txt.includes("جميع الحقوق")) el.textContent = "© 2026 FixGo. All rights reserved.";
+        });
+    }
+</script>
+<div id="chat-container">
+      <div id="chat-babble" onclick="window.location.href='https://fixgo-434704003961.europe-west2.run.app'">
+         <span>دردش معنا</span>
+         <div class="icon">💬</div>
+     </div>
+</div>
+<style>
+    /* 1. الحاوية الرئيسية */
+    #chat-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+
+    /* 2. تصميم الفقاعة */
+    #chat-bubble { 
+        background: linear-gradient(135deg, #007bff, #6f42c1);
+        color: white; padding: 10px 20px; 
+        border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    /* 3. تصميم نافذة الدردشة */
+    #chat-window {
+        width: 300px; height: 400px; background: white; border: 1px solid #ccc;
+        position: absolute; bottom: 60px; right: 0; border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column;
+    }
+    .chat-header { background: #6f42c1; color: white; padding: 10px; display: flex; justify-content: space-between; }
+    .chat-body { padding: 15px; flex-grow: 1; overflow-y: auto; }
+    .chat-footer { padding: 10px; border-top: 1px solid #ccc; }
+    .chat-footer input { width: 90%; padding: 5px; }
+
+    /* 4. فقاعات الرسائل */
+    .user-message {
+        background: linear-gradient(135deg, #007bff, #6f42c1);
+        color: white; padding: 10px; margin: 5px;
+        border-radius: 15px 15px 0 15px; text-align: right;
+    }
+    .bot-message {
+        background: #f1f1f1; color: #333; padding: 10px; margin: 5px;
+        border-radius: 15px 15px 15px 0; text-align: left;
+    }
+</style>
+
+<script>
+    function toggleChat() {
+        var chatWindow = document.getElementById('chat-window');
+        chatWindow.style.display = (chatWindow.style.display === 'none') ? 'flex' : 'none';
+    }
+</script>
+</html>
