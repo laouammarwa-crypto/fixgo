@@ -257,7 +257,7 @@
                     </div>
                     
                                         
-                    <form method="POST" action="register_process.php" enctype="multipart/form-data">
+                    <form id="registrationForm">
                          <input type="hidden" name="role" id="selected_role" value="">
                         <!-- اختيار نوع الحساب -->
                         <div class="role-selector">
@@ -411,7 +411,7 @@
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn-register mt-3">
+                        <button type="button" id="registerBtn" class="btn-register mt-3">
                             <i class="fas fa-user-plus"></i> إنشاء حساب
                         </button>
                         
