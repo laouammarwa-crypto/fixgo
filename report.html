@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>إبلاغ عن عطل - FixGo</title>
+    <style>
+        /* الأساسيات والخلفية */
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; height: 100vh; overflow: hidden;
+               background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+               display: flex; align-items: center; justify-content: center; }
+        
+        .bg-circle { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.1); animation: float 20s infinite ease-in-out; z-index: 0; }
+        .circle1 { width: 300px; height: 300px; top: -50px; right: -50px; }
+        .circle2 { width: 400px; height: 400px; bottom: -100px; left: -100px; animation-delay: 5s; }
+        
+        /* صندوق النموذج */
+        .container { position: relative; z-index: 1; width: 90%; max-width: 500px; background: white; padding: 30px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        .report-box { background: #f8f9fa; padding: 20px; border-radius: 20px; margin-bottom: 15px; }
+        textarea { width: 100%; border: none; background: transparent; height: 80px; resize: none; outline: none; font-size: 16px; }
+        .controls { display: flex; gap: 15px; margin-top: 10px; cursor: pointer; }
+        
+        /* الحقول */
+        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; }
+        
+        /* الأزرار */
+        .loc-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .pulse-btn { width: 100%; padding: 15px; border: none; border-radius: 12px; background: #ff4757; color: white; font-weight: bold; cursor: pointer; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(255, 71, 87, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+    </style>
+</head>
+<body>
+
+    <div class="bg-circle circle1"></div>
+    <div class="bg-circle circle2"></div>
+
+    <div class="container">
+	  <form id="reportForm">
+         <h2 style="margin-top:0;">صف العطل الذي تواجهه</h2>
+		 <div class="report-box">
+                <textarea name="description" placeholder="اكتب وصف العطل هنا..."></textarea>
+                <div class="controls">
+                    <span class="icon-btn-mic" onclick="toggleRecording()" style="cursor:pointer; font-size:24px;">🎤</span>
+                    <span onclick="document.getElementById('fileInput').click()">➕</span>
+                    <input type="file" id="fileInput" style="display:none">
+                </div>
+            </div>
+    
+         <div class="grid-inputs" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+         <div>
+             <label style="display:block; margin-bottom:5px; font-weight:bold;">الشركة</label>
+             <input type="text" name="brand" placeholder="مثال: تويوتا">
+         </div>
+         <div>
+             <label style="display:block; margin-bottom:5px; font-weight:bold;">الطراز</label>
+             <input type="text" name="model" placeholder="مثال: كورولا">
+         </div>
+         <div>
+             <label style="display:block; margin-bottom:5px; font-weight:bold;">عام الصنع</label>
+             <input type="number" name="year" placeholder="مثال: 2010">
+         </div>
+         </div>
+
+         <div style="margin-bottom: 15px;">
+             <label style="display:block; margin-bottom:5px; font-weight:bold;">الموقع الجغرافي</label>
+             <div class="loc-row" style="display: flex; gap: 10px;">
+                 <input type="text" id="location" name="location" placeholder="أدخل الموقع يدوياً أو اضغط تحديد" style="flex:1;">
+                 <button type="button" onclick="getLocation()" style="background:#4285f4; color:white; border:none; padding:0 20px; border-radius:10px; cursor:pointer;">تحديد</button>
+             </div>
+         </div>
+
+         <button type="button" class="pulse-btn" onclick="submitReport()">إرسال الطلب</button>
+      </form>
+    </div>
+
+    <script>let mediaRecorder;
+    let audioChunks = [];
+
+    function startRecording() {
+        // طلب إذن الوصول للميكروفون
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+                audioChunks = []; // إعادة تعيين البيانات السابقة
+                
+                // تلوين الأيقونة باللون الأحمر للإشارة إلى أن التسجيل بدأ
+                document.querySelector('.icon-btn-mic').style.color = 'red';
+                alert("جاري التسجيل الآن... اضغط مجدداً للإيقاف والحفظ");
+
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    document.querySelector('.icon-btn-mic').style.color = '#5f6368';
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    alert("تم حفظ التسجيل الصوتي بنجاح!");
+                    // هنا يمكنك إرسال audioBlob مع النموذج لاحقاً
+                };
+            })
+            .catch(error => {
+                alert("تعذر الوصول للميكروفون: تأكد من إعطاء الإذن للموقع.");
+            });
+    }
+
+    // لتفعيل الإيقاف عند الضغط مرة ثانية
+    function toggleRecording() {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+        } else {
+            startRecording();
+        }
+    }
+	// 1. وظيفة تحديد الموقع
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    document.getElementById('location').value = 
+                        position.coords.latitude + ", " + position.coords.longitude;
+                },
+                (error) => { alert("خطأ في تحديد الموقع: تأكد من تفعيل الـ GPS"); }
+            );
+        } else {
+            alert("متصفحك لا يدعم تحديد الموقع.");
+        }
+    }
+
+    // 2. وظيفة إرسال الطلب
+    function submitReport() {
+        const formData = new FormData(document.getElementById('reportForm'));
+
+        // إرسال البيانات إلى ملف الـ PHP
+        fetch('send_report.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            if(data.includes("success")) {
+                alert("تم إرسال رسالتك، سنتواصل معك في أقل من ساعتين بعد معاينة محتوى البلاغ.");
+            } else {
+                alert("نعتذر، هناك خطأ، حاول مجدداً.");
+            }
+        })
+        .catch(err => alert("خطأ في الاتصال بالسيرفر."));
+    }
+    </script>
+</body>
+</html>
