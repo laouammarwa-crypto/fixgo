@@ -1,0 +1,464 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل جديد - FixGo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            font-family: 'Tahoma', 'Segoe UI', 'Cairo', sans-serif;
+            padding: 50px 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* دوائر خلفية متحركة */
+        .bg-circle {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            animation: float 20s infinite ease-in-out;
+            z-index: 0;
+        }
+
+        .circle1 {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            right: -150px;
+            animation-delay: 0s;
+        }
+
+        .circle2 {
+            width: 600px;
+            height: 600px;
+            bottom: -250px;
+            left: -200px;
+            animation-delay: 5s;
+        }
+
+        .circle3 {
+            width: 250px;
+            height: 250px;
+            top: 40%;
+            right: 10%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+            25% { transform: translateY(-30px) translateX(20px) rotate(5deg); }
+            50% { transform: translateY(20px) translateX(-20px) rotate(-5deg); }
+            75% { transform: translateY(-20px) translateX(-10px) rotate(3deg); }
+        }
+
+        .register-card {
+            background: rgba(255,255,255,0.98);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 10;
+            transition: transform 0.3s;
+        }
+
+        .register-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(102,126,234,0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(102,126,234,0); }
+        }
+
+        .card-header-icon i {
+            font-size: 35px;
+            color: white;
+        }
+
+        h2 {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: bold;
+        }
+
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(118,75,162,0.2);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .btn-register {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .role-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #e9ecef;
+            background: white;
+        }
+
+        .role-option.active {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #667eea10, #764ba210);
+        }
+
+        .role-option:hover {
+            transform: translateY(-3px);
+            border-color: #764ba2;
+        }
+
+        .role-option i {
+            font-size: 30px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .role-option.user i { color: #667eea; }
+        .role-option.mechanic i { color: #f093fb; }
+        .role-option.tow i { color: #4facfe; }
+
+        .role-option.active .role-badge {
+            background: #764ba2;
+            color: white;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            background: #e9ecef;
+            color: #666;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border: none;
+            border-radius: 12px;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border: none;
+            border-radius: 12px;
+            color: #721c24;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .login-link a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .register-card {
+                padding: 25px;
+                margin: 15px;
+            }
+            .role-option {
+                padding: 10px;
+            }
+            .role-option i {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-circle circle1"></div>
+    <div class="bg-circle circle2"></div>
+    <div class="bg-circle circle3"></div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8" data-aos="fade-up">
+                <div class="register-card">
+                    <div class="text-center">
+                        <div class="card-header-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h2 class="mb-2">إنشاء حساب جديد</h2>
+                        <p class="text-muted mb-4">انضم إلى منصة FixGo وابدأ رحلتك</p>
+                    </div>
+                    
+                                        
+                    <form method="POST" action="register_process.php" enctype="multipart/form-data">
+                         <input type="hidden" name="role" id="selected_role" value="">
+                        <!-- اختيار نوع الحساب -->
+                        <div class="role-selector">
+                            <div class="role-option user active" onclick="selectRole('user')">
+                                <i class="fas fa-user"></i>
+                                <div>صاحب سيارة</div>
+                                <span class="role-badge">عميل</span>
+                            </div>
+                            <div class="role-option mechanic " onclick="selectRole('mechanic')">
+                                <i class="fas fa-wrench"></i>
+                                <div>ميكانيكي</div>
+                                <span class="role-badge">مقدم خدمة</span>
+                            </div>
+                            <div class="role-option tow " onclick="selectRole('tow')">
+                                <i class="fas fa-truck"></i>
+                                <div>خدمة سحب</div>
+                                <span class="role-badge">مقدم خدمة</span>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" name="role" id="selectedRole" value="user">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-user text-primary"></i> الاسم الكامل
+                                </label>
+                                <input type="text" name="name" class="form-control" required placeholder="أدخل اسمك الكامل">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-phone text-success"></i> رقم الهاتف
+                                </label>
+                                <input type="tel" name="phone" class="form-control" required placeholder="+213 XX XXX XXXX">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-envelope text-info"></i> البريد الإلكتروني
+                                </label>
+                                <input type="email" name="email" class="form-control" required placeholder="example@email.com">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-lock text-warning"></i> كلمة المرور
+                                </label>
+                                <input type="password" name="password" class="form-control" required placeholder="********">
+                            </div>
+                        </div>
+                        <!-- حقول بيانات السيارة المحدثة -->
+                        <div class="row">
+                           <div class="col-md-3 mb-3">
+                             <label class="form-label">نوع السيارة (الماركة)</label>
+                             <input type="tex t"  name="car_brand" class="form-control" placeholder="مثال: تويوتا" required>
+                          </div>
+                          <div class="col-md-3 mb-3">
+                             <label class="form-label">طراز السيارة</label>
+                              <input type="text" name="car_model" class="form-control" placeholder="مثال: كورولا" required>
+                          </div>
+                          <div class="col-md-3 mb-3">
+                             <label class="form-label">سنة الصنع</label>
+                             <input type="number" name="manufacturing_year" class="form-control" placeholder="مثال: 2024" required>
+                         </div>
+                         <div class="col-md-3 mb-3">
+                             <label class="form-label">نوع المركبة</label>
+                             <select name="vehicle_type" class="form-control" required>
+                                  <option value="" disabled selected>اختر النوع...</option>
+                                  <option value="private_car">سيارة خاصة</option>
+                                 <option value="truck">شاحنة</option>
+                                 <option value="light_truck">شاحنة خفيفة</option>
+                                 <option value="bus">حافلة</option>
+                                 <option value="motorcycle">دراجة نارية</option>
+                                 <option value="other">أخرى</option>
+                             </select>
+                          </div>
+                        </div>
+                        <!-- حقول إضافية للميكانيكي -->
+                        <div id="mechanic_fields" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-map-marker-alt text-danger"></i> موقع الورشة
+                                </label>
+                                <textarea name="address" class="form-control" rows="2" placeholder="أدخل موقع ورشتك بالكامل"></textarea>
+                            </div>
+                              
+						    <div class="col-md-6 mb-3">  
+                                  <label class="form-label">الرقم الجبائي</label>
+                                  <input type="text" name="tax_number" class="form-control" placeholder="أدخل الرقم الجبائي">
+                            </div>  
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-star text-warning"></i> سنوات الخبرة
+                                    </label>
+                                    <input type="number" name="experience" class="form-control" placeholder="مثال: 5">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-image text-primary"></i> صورة شخصية
+                                    </label>
+                                    <input type="file" name="profile_image" class="form-control" accept="image/*">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-tools text-primary"></i> الخدمات المقدمة
+                                </label>
+                                <textarea name="services" class="form-control" rows="4" placeholder="مثال:&#10;• تغيير زيت وفلاتر&#10;• إصلاح محركات&#10;• فحص كهرباء السيارات&#10;• تبديل إطارات"></textarea>
+                                <small class="text-muted">اكتب كل خدمة في سطر منفصل</small>
+                            </div>
+                        </div>
+                        
+                        <!-- حقول إضافية لخدمة السحب -->
+                        <div id="tow_fields" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-map-marker-alt text-danger"></i> عنوان الشركة
+                                </label>
+                                <textarea name="address" class="form-control" rows="2" placeholder="أدخل عنوان الشركة"></textarea>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-tools text-primary"></i> نوع الخدمة
+                                    </label>
+                                    <select name="service_type" class="form-select">
+                                        <option value="سحب">سحب سيارات</option>
+                                        <option value="تدخل سريع">تدخل سريع</option>
+                                        <option value="كلاهما">كلاهما</option>
+                                    </select>
+                                </div>
+								
+								<div class="col-md-6 mb-3">  
+                                  <label class="form-label">الرقم الجبائي</label>
+                                  <input type="text" name="tax_number" class="form-control" placeholder="أدخل الرقم الجبائي">
+                               </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-image text-primary"></i> صورة الشاحنة
+                                    </label>
+                                    <input type="file" name="truck_image" class="form-control" accept="image/*">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-register mt-3">
+                            <i class="fas fa-user-plus"></i> إنشاء حساب
+                        </button>
+                        
+                        <div class="login-link">
+                            لديك حساب بالفعل؟ <a href="login.php">سجل دخولك الآن</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        function selectRole(role) {
+            document.getElementById('selectedRole').value = role;
+            
+            // تحديث الواجهة
+            document.querySelectorAll('.role-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            document.querySelector(`.role-option.${role}`).classList.add('active');
+            
+            // إظهار/إخفاء الحقول
+            document.getElementById('mechanic_fields').style.display = role == 'mechanic' ? 'block' : 'none';
+            document.getElementById('tow_fields').style.display = role == 'tow' ? 'block' : 'none';
+            
+            // تغيير لون الأيقونة في الرأس
+            const headerIcon = document.querySelector('.card-header-icon');
+            if (role == 'user') {
+                headerIcon.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            } else if (role == 'mechanic') {
+                headerIcon.style.background = 'linear-gradient(135deg, #f093fb, #f5576c)';
+            } else {
+                headerIcon.style.background = 'linear-gradient(135deg, #4facfe, #00f2fe)';
+            }
+        }
+        
+        // تهيئة الصفحة
+        selectRole('user');
+    </script>
+</body>
+</html>
