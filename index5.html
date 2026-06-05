@@ -1,0 +1,466 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شاحنات الإسعاف - FixGo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f0f2f5; font-family: 'Tahoma', 'Segoe UI', sans-serif; }
+
+        .sidebar {
+            position: fixed; right: 0; top: 0; width: 280px; height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.1); z-index: 1000; overflow-y: auto;
+        }
+
+        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .profile-img { width: 80px; height: 80px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+        .sidebar-menu a { display: block; padding: 12px 25px; color: white; text-decoration: none; transition: all 0.3s; }
+        .sidebar-menu a:hover { background: rgba(255,255,255,0.2); padding-right: 35px; }
+        .sidebar-menu a i { margin-left: 10px; width: 25px; }
+        .sidebar-menu a.active { background: rgba(255,255,255,0.3); border-right: 4px solid white; }
+        .badge-notification { float: left; background: #ff4757; padding: 2px 8px; border-radius: 20px; font-size: 11px; }
+        .main-content { margin-right: 280px; padding: 20px; }
+
+        .truck-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        .truck-card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .truck-img { width: 100%; height: 180px; object-fit: cover; background: #f8f9fa; display: flex; align-items: center; justify-content: center; }
+        .distance-badge { position: absolute; top: 10px; right: 10px; background: #dc3545; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; z-index: 10; }
+        .service-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; background: #e9ecef; color: #495057; }
+        .filter-bar { background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+        
+        /* نافذة التفاصيل المنبثقة */
+        .modal-detail {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .modal-detail.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content-detail {
+            background: white;
+            border-radius: 25px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal-header-detail {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 25px 25px 0 0;
+            text-align: center;
+        }
+        .modal-body-detail {
+            padding: 20px;
+        }
+        .modal-footer-detail {
+            padding: 15px 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .close-modal:hover {
+            background: rgba(255,255,255,0.5);
+        }
+        .detail-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f5576c;
+            margin: 0 auto 15px;
+            display: block;
+        }
+        .detail-info {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        .detail-info i {
+            width: 30px;
+            color: #f5576c;
+        }
+        .detail-map {
+            height: 200px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-right: 0; }
+            .menu-toggle { display: block; position: fixed; top: 15px; right: 15px; z-index: 1001; background: #667eea; color: white; border: none; padding: 10px; border-radius: 5px; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle d-md-none" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="profile-img"><i class="fas fa-user-circle fa-4x" style="color: #667eea;"></i></div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> الرئيسية</a>
+            <a href="mechanics.php"><i class="fas fa-wrench"></i> الميكانيكيين</a>
+            <a href="map_mechanics.php"><i class="fas fa-map"></i> خريطة الميكانيكيين</a>
+            <a href="tow_trucks.php" class="active"><i class="fas fa-truck"></i> شاحنات الإسعاف</a>
+            <a href="requests.php"><i class="fas fa-tasks"></i> طلباتي</a>
+            <a href="messages.php"><i class="fas fa-envelope"></i> الرسائل
+                            </a>
+            <a href="../logout.php"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-truck text-danger"></i> شاحنات الإسعاف</h2>
+            <button class="btn btn-outline-danger" onclick="getUserLocation()">
+                <i class="fas fa-location-dot"></i> تحديد موقعي
+            </button>
+        </div>
+
+        <div class="filter-bar">
+            <form method="GET" action="" class="row g-3">
+               <div class="search-container">
+                 <select id="service-select" onchange="checkOther(this)" style="padding: 5px; border-radius: 5px;">
+                     <option value="" disabled selected>اختر نوع العطل...</option>
+                     <option value="حادث مرور">حادث مرور</option>
+                     <option value="عطل محرك">عطل محرك</option>
+                     <option value="عطل علبة السرعات">عطل علبة السرعات</option>
+                     <option value="عطل فرامل">عطل فرامل</option>
+                     <option value="عطل توجيه">عطل توجيه</option>
+                     <option value="عطل تعليق">عطل تعليق</option>
+                     <option value="سيارة عالقة">سيارة عالقة</option>
+                     <option value="نقل مركبة">نقل مركبة</option>
+                     <option value="أخرى">أخرى</option>
+                 </select>
+
+                 <input type="text" id="other-input" style="display:none; padding: 5px; border-radius: 5px;" placeholder="اكتب نوع العطل هنا...">
+               </div>
+
+                
+                <div class="col-md-3">
+                    <input type="hidden" name="lat" value="">
+                    <input type="hidden" name="lng" value="">
+                    <button type="submit" class="btn btn-danger w-100"><i class="fas fa-search"></i> بحث</button>
+                </div>
+            </form>
+        </div>
+
+        
+        <div class="row">
+                            <div class="col-12">
+                    <div class="alert alert-warning text-center py-5">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <h5>لا توجد نتائج</h5>
+                        <p class="mb-0">لم يتم العثور على شاحنات إسعاف مطابقة لبحثك</p>
+                    </div>
+                </div>
+                    </div>
+    </div>
+
+    <!-- نافذة تفاصيل الشاحنة المنبثقة -->
+    <div id="truckModal" class="modal-detail">
+        <div class="modal-content-detail">
+            <button class="close-modal" onclick="closeModal()">✕</button>
+            <div class="modal-header-detail">
+                <i class="fas fa-truck fa-3x"></i>
+                <h3 class="mt-2" id="modalTruckName">اسم الشاحنة</h3>
+                <span id="modalServiceType" class="badge bg-light text-dark mt-2"></span>
+            </div>
+            <div class="modal-body-detail">
+                <img id="modalTruckImage" class="detail-img" src="" alt="صورة الشاحنة">
+                
+                <div class="detail-info">
+                    <i class="fas fa-user"></i> <strong>اسم المالك:</strong><br>
+                    <span id="modalName"></span>
+                </div>
+                
+                <div class="detail-info">
+                    <i class="fas fa-phone"></i> <strong>رقم الهاتف:</strong><br>
+                    <span id="modalPhone"></span>
+                </div>
+                
+                <div class="detail-info">
+                    <i class="fas fa-envelope"></i> <strong>البريد الإلكتروني:</strong><br>
+                    <span id="modalEmail"></span>
+                </div>
+                
+                <div class="detail-info">
+                    <i class="fas fa-map-marker-alt"></i> <strong>العنوان:</strong><br>
+                    <span id="modalAddress"></span>
+                </div>
+                
+                <div class="detail-info">
+                    <i class="fas fa-wrench"></i> <strong>نوع الخدمة:</strong><br>
+                    <span id="modalServiceTypeText"></span>
+                </div>
+                
+                <div class="detail-info">
+                    <i class="fas fa-calendar"></i> <strong>تاريخ التسجيل:</strong><br>
+                    <span id="modalDate"></span>
+                </div>
+                
+                <div id="modalLocationSection" style="display: none;">
+                    <div class="detail-info">
+                        <i class="fas fa-map"></i> <strong>الموقع على الخريطة:</strong><br>
+                        <div id="modalMap" class="detail-map"></div>
+                        <small class="text-muted d-block mt-1" id="modalCoordinates"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer-detail">
+                <button class="btn btn-danger" onclick="closeModalAndRequest()">
+                    <i class="fas fa-truck"></i> طلب مساعدة
+                </button>
+                <button class="btn btn-success" onclick="closeModalAndMessage()">
+                    <i class="fas fa-envelope"></i> إرسال رسالة
+                </button>
+                <button class="btn btn-secondary" onclick="closeModal()">
+                    <i class="fas fa-times"></i> إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        AOS.init({ duration: 800, once: true });
+        
+        let currentTruck = null;
+        let modalMap = null;
+        
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+        
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    window.location.href = 'tow_trucks.php?lat=' + lat + '&lng=' + lng + '&sort=distance';
+                }, function() {
+                    alert('يرجى السماح بتحديد الموقع');
+                });
+            } else {
+                alert("المتصفح لا يدعم تحديد الموقع");
+            }
+        }
+        
+        // عرض نافذة تفاصيل الشاحنة
+        function showTruckDetails(truck) {
+            currentTruck = truck;
+            
+            document.getElementById('modalTruckName').innerHTML = truck.name;
+            document.getElementById('modalName').innerHTML = truck.name;
+            document.getElementById('modalPhone').innerHTML = truck.phone;
+            document.getElementById('modalEmail').innerHTML = truck.email;
+            document.getElementById('modalAddress').innerHTML = truck.address;
+            document.getElementById('modalServiceTypeText').innerHTML = truck.service_type;
+            document.getElementById('modalDate').innerHTML = truck.created_at ? truck.created_at.split(' ')[0] : 'غير متوفر';
+            
+            // صورة الشاحنة
+            if (truck.truck_image && truck.truck_image !== '') {
+                document.getElementById('modalTruckImage').src = '../' + truck.truck_image;
+                document.getElementById('modalTruckImage').style.display = 'block';
+            } else {
+                document.getElementById('modalTruckImage').style.display = 'none';
+            }
+            
+            // عرض الخريطة إذا كان هناك موقع
+            if (truck.latitude && truck.longitude) {
+                document.getElementById('modalLocationSection').style.display = 'block';
+                document.getElementById('modalCoordinates').innerHTML = `خط العرض: ${truck.latitude} | خط الطول: ${truck.longitude}`;
+                
+                // تهيئة الخريطة
+                setTimeout(() => {
+                    if (modalMap) {
+                        modalMap.remove();
+                    }
+                    modalMap = L.map('modalMap').setView([truck.latitude, truck.longitude], 15);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap'
+                    }).addTo(modalMap);
+                    
+                    var icon = L.divIcon({
+                        html: '<div style="background: #dc3545; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white;"></div>',
+                        iconSize: [25, 25]
+                    });
+                    L.marker([truck.latitude, truck.longitude], {icon: icon}).addTo(modalMap)
+                        .bindPopup('<strong>' + truck.name + '</strong><br>' + truck.address);
+                }, 100);
+            } else {
+                document.getElementById('modalLocationSection').style.display = 'none';
+            }
+            
+            document.getElementById('truckModal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('truckModal').classList.remove('show');
+            if (modalMap) {
+                modalMap.remove();
+                modalMap = null;
+            }
+            currentTruck = null;
+        }
+        
+        function closeModalAndRequest() {
+            closeModal();
+            if (currentTruck) {
+                requestHelp(currentTruck.id);
+            }
+        }
+        
+        function closeModalAndMessage() {
+            closeModal();
+            if (currentTruck) {
+                sendMessage(currentTruck.id, 'tow');
+            }
+        }
+        
+        function requestHelp(truckId) {
+            var description = prompt("وصف المشكلة (نوع العطل، الموقع، تفاصيل إضافية):");
+            if (description) {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        var lat = position.coords.latitude;
+                        var lng = position.coords.longitude;
+                        
+                        $.ajax({
+                            url: 'send_request.php',
+                            type: 'POST',
+                            data: {
+                                type: 'tow',
+                                provider_id: truckId,
+                                description: description,
+                                latitude: lat,
+                                longitude: lng
+                            },
+                            success: function(response) {
+                                alert("تم إرسال طلب المساعدة بنجاح");
+                                window.location.href = 'requests.php';
+                            },
+                            error: function() {
+                                alert("حدث خطأ في إرسال الطلب");
+                            }
+                        });
+                    }, function() {
+                        alert('يرجى السماح بتحديد الموقع');
+                    });
+                } else {
+                    alert("المتصفح لا يدعم تحديد الموقع");
+                }
+            }
+        }
+        
+        function sendMessage(receiverId, receiverType) {
+            var message = prompt("أدخل رسالتك:");
+            if (message) {
+                $.ajax({
+                    url: 'send_message.php',
+                    type: 'POST',
+                    data: {
+                        receiver_id: receiverId,
+                        receiver_type: receiverType,
+                        message: message
+                    },
+                    success: function(response) {
+                        alert("تم إرسال الرسالة بنجاح");
+                    },
+                    error: function() {
+                        alert("حدث خطأ في إرسال الرسالة");
+                    }
+                });
+            }
+        }
+        
+        // إغلاق النافذة عند الضغط على ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // إغلاق النافذة عند الضغط خارجها
+        document.getElementById('truckModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+	
+<script>
+function checkOther(select) {
+    var otherInput = document.getElementById("other-input");
+    if (select.value === "أخرى") {
+        otherInput.style.display = "inline-block";
+        otherInput.required = true; // يجعل الحقل مطلوباً إذا تم اختياره
+    } else {
+        otherInput.style.display = "none";
+        otherInput.required = false;
+    }
+}
+</script>
+</body>
+</html>
