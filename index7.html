@@ -383,6 +383,30 @@ document.querySelector(".btn-login").addEventListener("click", (e) => {
       alert("خطأ: يرجى التأكد من البريد وكلمة المرور");
     });
 });
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-firestore.js";
+
+const auth = getAuth();
+const db = getFirestore();
+
+// مراقبة حالة المستخدم
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    // المستخدم مسجل دخول، نجلب بياناته من Firestore
+    const docRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const userData = docSnap.data();
+      // تحديث الواجهة بالمعلومات الفعلية
+      document.getElementById('user-name').innerText = userData.fullName; 
+      document.getElementById('user-email').innerHTML = `<i class="fas fa-envelope"></i> ${user.email}`;
+    }
+  } else {
+    // إذا لم يكن مسجلاً، أعده لصفحة الدخول
+    window.location.href = "index7.html";
+  }
+});
 
     </script>
 </body>
