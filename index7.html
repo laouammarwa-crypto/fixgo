@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - المستخدم | FixGo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f2f5;
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+        }
+
+        .sidebar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 280px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .profile-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 25px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+            padding-right: 35px;
+        }
+
+        .sidebar-menu a i {
+            margin-left: 10px;
+            width: 25px;
+        }
+
+        .sidebar-menu a.active {
+            background: rgba(255,255,255,0.3);
+            border-right: 4px solid white;
+        }
+
+        .badge-notification {
+            float: left;
+            background: #ff4757;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+
+        .main-content {
+            margin-right: 280px;
+            padding: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .request-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-right: 4px solid #667eea;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-accepted { background: #d4edda; color: #155724; }
+        .status-completed { background: #cce5ff; color: #004085; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+
+        .welcome-message {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            color: #667eea;
+        }
+
+        .action-btn i {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-right: 0;
+            }
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 15px;
+                right: 15px;
+                z-index: 1001;
+                background: #667eea;
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+            }
+            .quick-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle d-md-none" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="profile-img">
+                <i class="fas fa-user-circle fa-4x" style="color: #667eea;"></i>
+            </div>
+            <h5>laouam marwa</h5>
+            <small><i class="fas fa-envelope"></i> laouammarwa@gmail.com</small>
+        </div>
+        <div class="sidebar-menu">
+            <a href="dashboard.php" class="active"><i class="fas fa-tachometer-alt"></i> الرئيسية</a>
+            <a href="mechanics.php"><i class="fas fa-wrench"></i> الميكانيكيين</a>
+            <a href="map_mechanics.php"><i class="fas fa-map"></i> خريطة الميكانيكيين</a>
+            <a href="tow_trucks.php"><i class="fas fa-truck"></i> شاحنات الإسعاف</a>
+            <a href="requests.php"><i class="fas fa-tasks"></i> طلباتي</a>
+            <a href="messages.php"><i class="fas fa-envelope"></i> الرسائل
+                            </a>
+            <a href="../logout.php"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- رسالة ترحيب -->
+        <div class="welcome-message" data-aos="fade-down">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-1"><i class="fas fa-hand-wave"></i> مرحباً laouam marwa!</h3>
+                    <p class="mb-0 opacity-75">مرحباً بك في منصة FixGo - خدمات السيارات الذكية</p>
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark p-2">
+                        <i class="fas fa-calendar"></i> 2026-06-05                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- إحصائيات سريعة -->
+        <div class="row" data-aos="fade-up">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e3f2fd; color: #1976d2;">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3>0</h3>
+                    <p class="text-muted">إجمالي الطلبات</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fff3e0; color: #f57c00;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>0</h3>
+                    <p class="text-muted">قيد الانتظار</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e8f5e9; color: #388e3c;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>0</h3>
+                    <p class="text-muted">مقبولة</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #cce5ff; color: #004085;">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <h3>0</h3>
+                    <p class="text-muted">مكتملة</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- أزرار سريعة -->
+        <div class="quick-actions" data-aos="fade-up" data-aos-delay="100">
+            <a href="mechanics.php" class="action-btn">
+                <i class="fas fa-wrench text-primary"></i>
+                <strong>البحث عن ميكانيكي</strong>
+                <small class="text-muted d-block">اعثر على أقرب ميكانيكي</small>
+            </a>
+            <a href="map_mechanics.php" class="action-btn">
+                <i class="fas fa-map text-primary"></i>
+                <strong>خريطة الميكانيكيين</strong>
+                <small class="text-muted d-block">عرض جميع الميكانيكيين على الخريطة</small>
+            </a>
+            <a href="tow_trucks.php" class="action-btn">
+                <i class="fas fa-truck text-danger"></i>
+                <strong>خدمات السحب</strong>
+                <small class="text-muted d-block">طلب شاحنة إسعاف</small>
+            </a>
+            <a href="#" class="action-btn" onclick="getLocation()">
+                <i class="fas fa-location-dot text-success"></i>
+                <strong>تحديد موقعي</strong>
+                <small class="text-muted d-block">للعثور على أقرب الخدمات</small>
+            </a>
+        </div>
+
+        <!-- آخر الطلبات -->
+        <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5><i class="fas fa-history text-primary"></i> آخر طلباتي</h5>
+                <a href="requests.php" class="btn btn-sm btn-outline-primary">عرض الكل</a>
+            </div>
+            <hr>
+            
+                            <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">لا توجد طلبات بعد</p>
+                    <a href="mechanics.php" class="btn btn-primary btn-sm">اطلب خدمة الآن</a>
+                </div>
+                    </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+        
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    localStorage.setItem('user_lat', lat);
+                    localStorage.setItem('user_lng', lng);
+                    alert('تم تحديد موقعك بنجاح! سيتم عرض أقرب الخدمات لك.');
+                    window.location.href = 'mechanics.php?lat=' + lat + '&lng=' + lng;
+                }, function() {
+                    alert('يرجى السماح بتحديد الموقع للعثور على أقرب الخدمات');
+                });
+            } else {
+                alert("المتصفح لا يدعم تحديد الموقع");
+            }
+        }
+    </script>
+	
+    
+    <script>
+	import { initializeApp } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-auth.js";
+
+// ضعي بياناتك التي نسختِها من Firebase هنا
+const firebaseConfig = {
+  apiKey: "AIzaSyBRjbfsiiTauEPzU6_im6GzcnThnjzLr1Y",
+  authDomain: "fixgo-c1eb3.firebaseapp.com",
+  projectId: "fixgo-c1eb3",
+  storageBucket: "fixgo-c1eb3.firebasestorage.app",
+  messagingSenderId: "703488228358",
+  appId: "1:703488228358:web:1c473dbfbf144c732e5787"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// ربط زر الدخول
+document.querySelector(".btn-login").addEventListener("click", (e) => {
+  e.preventDefault(); // منع الصفحة من إعادة التحميل
+  const email = document.querySelector('input[type="email"]').value;
+  const password = document.querySelector('input[type="password"]').value;
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      alert("تم تسجيل الدخول بنجاح!");
+      window.location.href = "dashboard.html"; // وجهيه للوحة التحكم
+    })
+    .catch((error) => {
+      alert("خطأ: يرجى التأكد من البريد وكلمة المرور");
+    });
+});
+
+    </script>
+</body>
+</html>
